@@ -1,0 +1,106 @@
+{
+ "name": "out_of_scope",
+ "prompts": [
+  "Book me a flight to Sydney.",
+  "Order me a pizza"
+ ],
+ "model": "qwen3:8b",
+ "recorded_at": "2026-11-17T15:49:43+00:00",
+ "frozen_now": "2026-11-18T07:45:00+10:00",
+ "events": [
+  {
+   "t": 2.29,
+   "event": {
+    "type": "plan",
+    "request_id": "5d0b84a741364da59b06c691ff34d2e0",
+    "plan": {
+     "intent": "out_of_scope",
+     "steps": [],
+     "clarification_question": null,
+     "repairs": []
+    }
+   }
+  },
+  {
+   "t": 2.29,
+   "event": {
+    "type": "final",
+    "request_id": "5d0b84a741364da59b06c691ff34d2e0",
+    "status": "out_of_scope",
+    "text": "I can only help with getting around (buses and trains), the weather for your trips, and your calendar. I can't help with that one.",
+    "pending_approvals": [],
+    "tokens_in": 1277,
+    "tokens_out": 17,
+    "duration_ms": 2284
+   }
+  }
+ ],
+ "spans": [
+  {
+   "request_id": "5d0b84a741364da59b06c691ff34d2e0",
+   "span_id": "3a9afdafd21e4178",
+   "parent_id": null,
+   "kind": "orchestrator",
+   "name": "orchestrator",
+   "start": 0.0,
+   "end": 2.2841,
+   "status": "ok",
+   "input_preview": "Book me a flight to Sydney.",
+   "output_preview": "I can only help with getting around (buses and trains), the weather for your trips, and your calendar. I can't help with that one.",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": null,
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "session_id": "rec-6",
+    "status": "out_of_scope"
+   }
+  },
+  {
+   "request_id": "5d0b84a741364da59b06c691ff34d2e0",
+   "span_id": "1e6b408ae7fa41ef",
+   "parent_id": "3a9afdafd21e4178",
+   "kind": "orchestrator",
+   "name": "router",
+   "start": 0.0002,
+   "end": 2.2827,
+   "status": "ok",
+   "input_preview": "Book me a flight to Sydney.",
+   "output_preview": "{\"intent\":\"out_of_scope\",\"steps\":[],\"clarification_question\":null,\"repairs\":[]}",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "prompt_version": "router-v3",
+    "plan": {
+     "intent": "out_of_scope",
+     "steps": [],
+     "clarification_question": null,
+     "repairs": []
+    },
+    "attempts": 1
+   }
+  },
+  {
+   "request_id": "5d0b84a741364da59b06c691ff34d2e0",
+   "span_id": "c1272f342c054ebe",
+   "parent_id": "1e6b408ae7fa41ef",
+   "kind": "llm",
+   "name": "router.llm#1",
+   "start": 0.0002,
+   "end": 2.2808,
+   "status": "ok",
+   "input_preview": "Book me a flight to Sydney.",
+   "output_preview": "{\"intent\":\"out_of_scope\",\"steps\":[],\"clarification_question\":null}",
+   "tokens_in": 1277,
+   "tokens_out": 17,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {}
+  }
+ ]
+}

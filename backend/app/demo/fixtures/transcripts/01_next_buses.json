@@ -1,0 +1,266 @@
+{
+ "name": "next_buses",
+ "prompts": [
+  "Next 3 buses from home to Chermside",
+  "When are the next buses from North Lakes to Chermside?",
+  "What buses go to Chermside soon?"
+ ],
+ "model": "qwen3:8b",
+ "recorded_at": "2026-11-17T15:44:32+00:00",
+ "frozen_now": "2026-11-18T07:45:00+10:00",
+ "events": [
+  {
+   "t": 3.55,
+   "event": {
+    "type": "plan",
+    "request_id": "9355920b75094eb998637c24fb18ac53",
+    "plan": {
+     "intent": "transit",
+     "steps": [
+      {
+       "id": "s1",
+       "agent": "transit",
+       "task": "Find the next 3 buses from home to Chermside",
+       "depends_on": []
+      }
+     ],
+     "clarification_question": null,
+     "repairs": []
+    }
+   }
+  },
+  {
+   "t": 3.55,
+   "event": {
+    "type": "step_started",
+    "id": "s1",
+    "agent": "transit",
+    "task": "Find the next 3 buses from home to Chermside"
+   }
+  },
+  {
+   "t": 19.92,
+   "event": {
+    "type": "step_result",
+    "id": "s1",
+    "agent": "transit",
+    "status": "ok",
+    "text": "The next 3 buses from home to Chermside are:\n\n1. **07:49** (Timetable-only, no live data)\n2. **08:00** (Delayed by 7 minutes, based on reported data)\n3. **08:19** (Timetable-only, no live data)\n\nAll times are for today (Wednesday 18 November 2026).",
+    "error": null,
+    "tool_calls": [
+     "next_departures"
+    ],
+    "duration_ms": 16373
+   }
+  },
+  {
+   "t": 33.72,
+   "event": {
+    "type": "final",
+    "request_id": "9355920b75094eb998637c24fb18ac53",
+    "status": "ok",
+    "text": "The next 3 buses from North Lakes station, platform 2 to Chermside Shopping Centre are scheduled at 07:49, 08:00 (delayed by 7 minutes), and 08:19.",
+    "pending_approvals": [],
+    "tokens_in": 6623,
+    "tokens_out": 229,
+    "duration_ms": 33722
+   }
+  }
+ ],
+ "spans": [
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "e4d43d08cbe84a64",
+   "parent_id": null,
+   "kind": "orchestrator",
+   "name": "orchestrator",
+   "start": 0.0,
+   "end": 33.7224,
+   "status": "ok",
+   "input_preview": "Next 3 buses from home to Chermside",
+   "output_preview": "The next 3 buses from North Lakes station, platform 2 to Chermside Shopping Centre are scheduled at 07:49, 08:00 (delayed by 7 minutes), and 08:19.",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": null,
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "session_id": "rec-1",
+    "status": "ok"
+   }
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "3b9b3107f4224737",
+   "parent_id": "e4d43d08cbe84a64",
+   "kind": "orchestrator",
+   "name": "router",
+   "start": 0.0001,
+   "end": 3.5474,
+   "status": "ok",
+   "input_preview": "Next 3 buses from home to Chermside",
+   "output_preview": "{\"intent\":\"transit\",\"steps\":[{\"id\":\"s1\",\"agent\":\"transit\",\"task\":\"Find the next 3 buses from home to Chermside\",\"depends_on\":[]}],\"clarification_question\":null,\"repairs\":[]}",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "prompt_version": "router-v3",
+    "plan": {
+     "intent": "transit",
+     "steps": [
+      {
+       "id": "s1",
+       "agent": "transit",
+       "task": "Find the next 3 buses from home to Chermside",
+       "depends_on": []
+      }
+     ],
+     "clarification_question": null,
+     "repairs": []
+    },
+    "attempts": 1
+   }
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "edaf8a4381644acb",
+   "parent_id": "3b9b3107f4224737",
+   "kind": "llm",
+   "name": "router.llm#1",
+   "start": 0.0001,
+   "end": 3.5462,
+   "status": "ok",
+   "input_preview": "Next 3 buses from home to Chermside",
+   "output_preview": "{\"intent\":\"transit\",\"steps\":[{\"id\":\"s1\",\"agent\":\"transit\",\"task\":\"Find the next 3 buses from home to Chermside\",\"depends_on\":[]}],\"clarification_question\":null}",
+   "tokens_in": 1280,
+   "tokens_out": 45,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {}
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "085003ffdf5542d2",
+   "parent_id": "e4d43d08cbe84a64",
+   "kind": "orchestrator",
+   "name": "step:s1",
+   "start": 3.5484,
+   "end": 19.9202,
+   "status": "ok",
+   "input_preview": "Find the next 3 buses from home to Chermside",
+   "output_preview": "",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": null,
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "agent": "transit",
+    "depends_on": []
+   }
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "a3906a0c1eb046cc",
+   "parent_id": "085003ffdf5542d2",
+   "kind": "agent",
+   "name": "transit",
+   "start": 3.5484,
+   "end": 19.9186,
+   "status": "ok",
+   "input_preview": "Current local time: Wednesday 18 November 2026 07:45.\n\nYour task: Find the next 3 buses from home to Chermside\n\nThe user's original request: Next 3 buses from home to Chermside",
+   "output_preview": "The next 3 buses from home to Chermside are:\n\n1. **07:49** (Timetable-only, no live data)\n2. **08:00** (Delayed by 7 minutes, based on reported data)\n3. **08:19** (Timetable-only, no live data)\n\nAll times are for today (Wednesday 18 November 2026).",
+   "tokens_in": 4143,
+   "tokens_out": 132,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "prompt_version": "transit-v1",
+    "status": "completed",
+    "steps": 2
+   }
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "7c674781f3844bec",
+   "parent_id": "a3906a0c1eb046cc",
+   "kind": "llm",
+   "name": "transit.llm#1",
+   "start": 3.5508,
+   "end": 7.2169,
+   "status": "ok",
+   "input_preview": "Current local time: Wednesday 18 November 2026 07:45.\n\nYour task: Find the next 3 buses from home to Chermside\n\nThe user's original request: Next 3 buses from home to Chermside",
+   "output_preview": "[\"next_departures\"]",
+   "tokens_in": 1737,
+   "tokens_out": 44,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "stop_reason": "tool_use"
+   }
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "08c632cfd72140e0",
+   "parent_id": "a3906a0c1eb046cc",
+   "kind": "tool",
+   "name": "next_departures",
+   "start": 7.2189,
+   "end": 7.266,
+   "status": "ok",
+   "input_preview": "{\"stop_id\": \"home\", \"towards\": \"Chermside\", \"modes\": [\"bus\"], \"limit\": 3}",
+   "output_preview": "{\"stops\":[{\"stop_id\":\"319806\",\"name\":\"North Lakes station, platform 1\"},{\"stop_id\":\"319805\",\"name\":\"North Lakes station, platform 2\"}],\"departures\":[{\"route\":\"680\",\"route_name\":\"Redcliffe - Chermside via North Lakes and Petrie\",\"mode\":\"bus\",\"headsign\":\"Chermside Shopping Centre\",\"stop_id\":\"319805\",\"stop_name\":\"North Lakes station, platform 2\",\"platform\":\"2\",\"scheduled\":\"07:49\",\"scheduled_iso\":\"2026-11-18T07:49:00+10:00\",\"predicted\":null,\"predicted_iso\":null,\"delay_min\":null,\"status\":\"scheduled_only\",\"delay_basis\":null,\"trip_id\":\"38086480-HBL 26_27-43488\",\"service_date\":\"2026-11-18\"},{\"route\":\"680\",\"route_name\":\"Redcliffe - Chermside via North Lakes and Petrie\",\"mode\":\"bus\",\"headsign\":\"Chermside Shopping Centre\",\"stop_id\":\"319805\",\"stop_name\":\"North Lakes station, platform 2\",\"platform\":\"2\",\"scheduled\":\"08:00\",\"scheduled_iso\":\"2026-11-18T08:00:00+10:00\",\"predicted\":\"08:07\",\"predicted_iso\":\"2026-11-18T08:07:00+10:00\",\"delay_min\":7.0,\"status\":\"delayed\",\"delay_basis\":\"reported\",\"trip_id\":\"38087074-HBL 26_27-43488\",\"service_date\":\"2026-11-18\"},{\"route\":\"680\",\"route_name\":\"Redcliffe - Chermside via North Lakes and Petrie\",\"mode\":\"bus\",\"headsign\":\"Chermside Shopping Centre\",\"stop_id\":\"319805\",\"stop_name\":\"North Lakes station, platform 2\",\"platform\":\"2\",\"scheduled\":\"08:19\",\"scheduled_iso\":\"2026-11-18T08:19:00+10:00\",\"predicted\":null,\"predicted_iso\":null,\"delay_min\":null,\"status\":\"scheduled_only\",\"delay_basis\":null,\"trip_id\":\"38086477-HBL 26_27-43488\",\"service_date\":\"2026-11-18\"}],\"realtime\":{\"source\":\"realtime\",\"feed_age_s\":8,\"stale\":false,\"note\":null},\"generated_at\":\"2026-11-18T07:45:00+10:00\",\"note\":null}",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": null,
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {}
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "9ee848cbfea14968",
+   "parent_id": "a3906a0c1eb046cc",
+   "kind": "llm",
+   "name": "transit.llm#2",
+   "start": 7.2666,
+   "end": 19.9159,
+   "status": "ok",
+   "input_preview": "[{\"type\": \"tool_result\", \"tool_use_id\": \"call_ghdjbotd\", \"content\": \"{\\\"stops\\\":[{\\\"stop_id\\\":\\\"319806\\\",\\\"name\\\":\\\"North Lakes station, platform 1\\\"},{\\\"stop_id\\\":\\\"319805\\\",\\\"name\\\":\\\"North Lakes station, platform 2\\\"}],\\\"departures\\\":[{\\\"route\\\":\\\"680\\\",\\\"route_name\\\":\\\"Redcliffe - Chermside via North Lakes and Petrie\\\",\\\"mode\\\":\\\"bus\\\",\\\"headsign\\\":\\\"Chermside Shopping Centre\\\",\\\"stop_id\\\":\\\"319805\\\",\\\"stop_name\\\":\\\"North Lakes station, platform 2\\\",\\\"platform\\\":\\\"2\\\",\\\"scheduled\\\":\\\"07:49\\\",\\\"scheduled_iso\\\":\\\"2026-11-18T07:49:00+10:00\\\",\\\"predicted\\\":null,\\\"predicted_iso\\\":null,\\\"delay_min\\\":null,\\\"status\\\":\\\"scheduled_only\\\",\\\"delay_basis\\\":null,\\\"trip_id\\\":\\\"38086480-HBL 26_27-43488\\\",\\\"service_date\\\":\\\"2026-11-18\\\"},{\\\"route\\\":\\\"680\\\",\\\"route_name\\\":\\\"Redcliffe - Chermside via North Lakes and Petrie\\\",\\\"mode\\\":\\\"bus\\\",\\\"headsign\\\":\\\"Chermside Shopping Centre\\\",\\\"stop_id\\\":\\\"319805\\\",\\\"stop_name\\\":\\\"North Lakes station, platform 2\\\",\\\"platform\\\":\\\"2\\\",\\\"scheduled\\\":\\\"08:00\\\",\\\"scheduled_iso\\\":\\\"2026-11-18T08:00:00+10:00\\\",\\\"predicted\\\":\\\"08:07\\\",\\\"predicted_iso\\\":\\\"2026-11-18T08:07:00+10:00\\\",\\\"delay_min\\\":7.0,\\\"status\\\":\\\"delayed\\\",\\\"delay_basis\\\":\\\"reported\\\",\\\"trip_id\\\":\\\"38087074-HBL 26_27-43488\\\",\\\"service_date\\\":\\\"2026-11-18\\\"},{\\\"route\\\":\\\"680\\\",\\\"route_name\\\":\\\"Redcliffe - Chermside via North Lakes and Petrie\\\",\\\"mode\\\":\\\"bus\\\",\\\"headsign\\\":\\\"Chermside Shopping Centre\\\",\\\"stop_id\\\":\\\"319805\\\",\\\"stop_name\\\":\\\"North Lakes station, platform 2\\\",\\\"platform\\\":\\\"2\\\",\\\"scheduled\\\":\\\"08:19\\\",\\\"scheduled_iso\\\":\\\"2026-11-18T08:19:00+10:00\\\",\\\"predicted\\\":null,\\\"predicted_iso\\\":null,\\\"delay_min\\\":null,\\\"status\\\":\\\"scheduled_only\\\",\\\"delay_basis\\\":null,\\\"trip_id\\\":\\\"38086477-HBL 26_27-43488\\\",\\\"service_date\\\":\\\"2026-11-18\\\"}],\\\"realtime\\\":{\\\"source\\\":\\\"realtime\\\",\\\"feed_age_s\\\":8,\\\"stale\\\":false,\\\"note\\\":null},\\\"generated_at\\\":\\\"2026-11-18T07:45:00+10:00\\\",\\\"note\\\":null}\"}]",
+   "output_preview": "The next 3 buses from home to Chermside are:\n\n1. **07:49** (Timetable-only, no live data)\n2. **08:00** (Delayed by 7 minutes, based on reported data)\n3. **08:19** (Timetable-only, no live data)\n\nAll times are for today (Wednesday 18 November 2026).",
+   "tokens_in": 2406,
+   "tokens_out": 88,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "stop_reason": "end_turn"
+   }
+  },
+  {
+   "request_id": "9355920b75094eb998637c24fb18ac53",
+   "span_id": "c7de3dbc58f44f18",
+   "parent_id": "e4d43d08cbe84a64",
+   "kind": "llm",
+   "name": "synthesiser",
+   "start": 19.9222,
+   "end": 33.7196,
+   "status": "ok",
+   "input_preview": "Next 3 buses from home to Chermside",
+   "output_preview": "The next 3 buses from North Lakes station, platform 2 to Chermside Shopping Centre are scheduled at 07:49, 08:00 (delayed by 7 minutes), and 08:19.",
+   "tokens_in": 1200,
+   "tokens_out": 52,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "prompt_version": "synth-v2"
+   }
+  }
+ ]
+}

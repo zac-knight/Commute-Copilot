@@ -1,0 +1,154 @@
+# Calendar: find_free_slots and conflicts_for (pure functions) on hand-made calendars.
+# Day 0 = Mon 2026-11-09. Times are Australia/Brisbane unless an offset is written. Working hours default
+# 09:00-17:00. Slots are written "MM-DD HH:MM-HH:MM". Expectations derived by hand.
+suite: calendar
+cases:
+  - id: ca01
+    desc: an empty working day is one free slot
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: []
+    expect:
+      - {path: slots, eq: ["11-09 09:00-17:00"]}
+
+  - id: ca02
+    desc: one event splits the day in two
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: Lunch, start: "12:00", end: "13:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-12:00", "11-09 13:00-17:00"]}
+
+  - id: ca03
+    desc: back-to-back events merge into a single block
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: A, start: "10:00", end: "11:00"}, {title: B, start: "11:00", end: "12:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-10:00", "11-09 12:00-17:00"]}
+
+  - id: ca04
+    desc: overlapping events merge (10:00-11:30 and 11:00-12:00 block 10:00-12:00)
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: A, start: "10:00", end: "11:30"}, {title: B, start: "11:00", end: "12:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-10:00", "11-09 12:00-17:00"]}
+
+  - id: ca05
+    desc: a 10 minute buffer pads both sides of a timed event
+    free: {start: "09:00", end: "17:00", duration: 60, buffer: 10}
+    events: [{title: Lunch, start: "12:00", end: "13:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-11:50", "11-09 13:10-17:00"]}
+
+  - id: ca06
+    desc: a gap shorter than the requested duration is not offered
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: A, start: "09:00", end: "10:00"}, {title: B, start: "10:30", end: "17:00"}]
+    expect:
+      - {path: slots, len: 0}
+
+  - id: ca07
+    desc: the same 30 minute gap is offered for a 30 minute request
+    free: {start: "09:00", end: "17:00", duration: 30}
+    events: [{title: A, start: "09:00", end: "10:00"}, {title: B, start: "10:30", end: "17:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 10:00-10:30"]}
+
+  - id: ca08
+    desc: an all-day event (a birthday, a holiday) does not block time by default
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: Birthday, start: "00:00", end: "00:00", end_day: 1, all_day: true, busy: false}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-17:00"]}
+
+  - id: ca09
+    desc: with all_day_blocks set, an all-day event blocks the whole day
+    free: {start: "09:00", end: "17:00", duration: 60, all_day_blocks: true}
+    events: [{title: Offsite, start: "00:00", end: "00:00", end_day: 1, all_day: true, busy: false}]
+    expect:
+      - {path: slots, len: 0}
+
+  - id: ca10
+    desc: an event marked free (transparent) never blocks
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: FYI, start: "10:00", end: "12:00", busy: false}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-17:00"]}
+
+  - id: ca11
+    desc: the search range is clipped to working hours
+    free: {start: "07:00", end: "20:00", duration: 60}
+    events: []
+    expect:
+      - {path: slots, eq: ["11-09 09:00-17:00"]}
+
+  - id: ca12
+    desc: a multi-day range returns the free time of each day inside working hours
+    free: {start: "15:00", end: "10:00", end_day: 1, duration: 60}
+    events: []
+    expect:
+      - {path: slots, eq: ["11-09 15:00-17:00", "11-10 09:00-10:00"]}
+
+  - id: ca13
+    desc: an event given in UTC is converted (02:00Z = 12:00 Brisbane)
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: UTC meeting, start: "2026-11-09T02:00:00+00:00", end: "2026-11-09T03:00:00+00:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-12:00", "11-09 13:00-17:00"]}
+
+  - id: ca14
+    desc: a Sydney (daylight saving, +11:00) event lands an hour earlier in Brisbane (no DST)
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: Sydney call, start: "2026-11-09T12:00:00+11:00", end: "2026-11-09T13:00:00+11:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-11:00", "11-09 12:00-17:00"]}
+
+  - id: ca15
+    desc: a fully booked working day has no free slot
+    free: {start: "09:00", end: "17:00", duration: 30}
+    events: [{title: Workshop, start: "09:00", end: "17:00"}]
+    expect:
+      - {path: slots, len: 0}
+
+  - id: ca16
+    desc: a zero-length event blocks nothing
+    free: {start: "09:00", end: "17:00", duration: 60}
+    events: [{title: Reminder, start: "12:00", end: "12:00"}]
+    expect:
+      - {path: slots, eq: ["11-09 09:00-17:00"]}
+
+  - id: ca17
+    desc: a proposed event overlapping an existing one is a conflict
+    conflicts: {start: "10:30", end: "11:30"}
+    events: [{title: Review, start: "10:00", end: "11:00"}]
+    expect:
+      - {path: overlapping, eq: [Review]}
+      - {path: close, len: 0}
+
+  - id: ca18
+    desc: an event ending exactly when the proposal starts is not an overlap
+    conflicts: {start: "11:00", end: "11:30"}
+    events: [{title: Review, start: "10:00", end: "11:00"}]
+    expect:
+      - {path: overlapping, len: 0}
+
+  - id: ca19
+    desc: with a buffer, a near-miss is reported as "too close", not as a conflict
+    conflicts: {start: "11:05", end: "11:35", buffer: 10}
+    events: [{title: Review, start: "10:00", end: "11:00"}]
+    expect:
+      - {path: overlapping, len: 0}
+      - {path: close, eq: [Review]}
+
+  - id: ca20
+    desc: all-day and free events never conflict
+    conflicts: {start: "10:00", end: "11:00"}
+    events:
+      - {title: Holiday, start: "00:00", end: "00:00", end_day: 1, all_day: true, busy: false}
+      - {title: FYI, start: "10:00", end: "11:00", busy: false}
+    expect:
+      - {path: overlapping, len: 0}
+
+  - id: ca21
+    desc: a range that ends before it starts is rejected, not silently accepted
+    free: {start: "17:00", end: "09:00", duration: 60}
+    events: []
+    expect_error: {contains: end}

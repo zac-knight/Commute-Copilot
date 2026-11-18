@@ -1,0 +1,127 @@
+{
+ "name": "clarify",
+ "prompts": [
+  "Should I leave now or wait? It looks like rain.",
+  "Should I leave now or wait?"
+ ],
+ "model": "qwen3:8b",
+ "recorded_at": "2026-11-17T15:49:41+00:00",
+ "frozen_now": "2026-11-18T07:45:00+10:00",
+ "events": [
+  {
+   "t": 10.77,
+   "event": {
+    "type": "plan",
+    "request_id": "45e2f6576318444abcc97217762b4a9c",
+    "plan": {
+     "intent": "clarify",
+     "steps": [],
+     "clarification_question": "Where are you heading?",
+     "repairs": []
+    }
+   }
+  },
+  {
+   "t": 10.77,
+   "event": {
+    "type": "final",
+    "request_id": "45e2f6576318444abcc97217762b4a9c",
+    "status": "clarify",
+    "text": "Where are you heading?",
+    "pending_approvals": [],
+    "tokens_in": 2625,
+    "tokens_out": 100,
+    "duration_ms": 10765
+   }
+  }
+ ],
+ "spans": [
+  {
+   "request_id": "45e2f6576318444abcc97217762b4a9c",
+   "span_id": "7e0e7e0e22e94ae2",
+   "parent_id": null,
+   "kind": "orchestrator",
+   "name": "orchestrator",
+   "start": 0.0,
+   "end": 10.7652,
+   "status": "ok",
+   "input_preview": "Should I leave now or wait? It looks like rain.",
+   "output_preview": "Where are you heading?",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": null,
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "session_id": "rec-5",
+    "status": "clarify"
+   }
+  },
+  {
+   "request_id": "45e2f6576318444abcc97217762b4a9c",
+   "span_id": "32aad45b13234de8",
+   "parent_id": "7e0e7e0e22e94ae2",
+   "kind": "orchestrator",
+   "name": "router",
+   "start": 0.0005,
+   "end": 10.7645,
+   "status": "ok",
+   "input_preview": "Should I leave now or wait? It looks like rain.",
+   "output_preview": "{\"intent\":\"clarify\",\"steps\":[],\"clarification_question\":\"Where are you heading?\",\"repairs\":[]}",
+   "tokens_in": 0,
+   "tokens_out": 0,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {
+    "prompt_version": "router-v3",
+    "attempt1_problems": [
+     "the plan uses ['southbank'] but the user never mentioned it; do not assume a destination. If the destination is unknown, ask a clarification_question"
+    ],
+    "plan": {
+     "intent": "clarify",
+     "steps": [],
+     "clarification_question": "Where are you heading?",
+     "repairs": []
+    },
+    "attempts": 2
+   }
+  },
+  {
+   "request_id": "45e2f6576318444abcc97217762b4a9c",
+   "span_id": "bdf67b61c63b4df6",
+   "parent_id": "32aad45b13234de8",
+   "kind": "llm",
+   "name": "router.llm#1",
+   "start": 0.0006,
+   "end": 7.881,
+   "status": "ok",
+   "input_preview": "Should I leave now or wait? It looks like rain.",
+   "output_preview": "{\"intent\":\"multi_agent\",\"steps\":[{\"id\":\"s1\",\"agent\":\"transit\",\"task\":\"Plan a trip from home to Southbank leaving now\",\"depends_on\":[]},{\"id\":\"s2\",\"agent\":\"weather\",\"task\":\"Should I leave now or wait? Advise on the planned trip, including what to bring\",\"depends_on\":[\"s1\"]}],\"clarification_question\":null}",
+   "tokens_in": 1282,
+   "tokens_out": 80,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {}
+  },
+  {
+   "request_id": "45e2f6576318444abcc97217762b4a9c",
+   "span_id": "cbd96358837e4bcc",
+   "parent_id": "32aad45b13234de8",
+   "kind": "llm",
+   "name": "router.llm#2",
+   "start": 7.8828,
+   "end": 10.764,
+   "status": "ok",
+   "input_preview": "That plan was rejected: the plan uses ['southbank'] but the user never mentioned it; do not assume a destination. If the destination is unknown, ask a clarification_question. Output a corrected JSON plan for my previous request only.",
+   "output_preview": "{\"intent\":\"clarify\",\"steps\":[],\"clarification_question\":\"Where are you heading?\"}",
+   "tokens_in": 1343,
+   "tokens_out": 20,
+   "model": "qwen3:8b",
+   "cost_estimate": null,
+   "error": null,
+   "attributes": {}
+  }
+ ]
+}

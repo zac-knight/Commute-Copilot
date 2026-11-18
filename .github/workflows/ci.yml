@@ -1,0 +1,57 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: backend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - run: uv sync --frozen
+      - run: uv run ruff check .
+      - run: uv run ruff format --check .
+      - run: uv run mypy app
+      # No live LLM or network calls in CI: tests use scripted/mocked clients only.
+      - run: uv run pytest --cov=app.core --cov=app.agents --cov=app.orchestrator --cov=app.main --cov-fail-under=85
+      # Deterministic evals (transit, advice, calendar, safety) on frozen fixtures: no model, no network.
+      # The live-model evals (router, end to end, judge) are run manually with `make eval-live`.
+      - run: uv run python -m evals.run_eval det
+
+  frontend:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: frontend
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npm run lint
+      - run: npm test
+      - run: npm run build
+
+  e2e:
+    runs-on: ubuntu-latest
+    needs: [backend, frontend]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: astral-sh/setup-uv@v5
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: frontend/package-lock.json
+      - run: cd backend && uv sync --frozen
+      - run: cd frontend && npm ci && npx playwright install --with-deps chromium
+      # demo mode: recorded answers + fake calendar, so no model, network or secrets are needed
+      - run: cd frontend && npx playwright test

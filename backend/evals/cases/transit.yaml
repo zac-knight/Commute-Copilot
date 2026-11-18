@@ -1,0 +1,265 @@
+# Transit correctness: the transit service on a hand-made timetable (tests/transit_fixtures.py) with a
+# frozen realtime snapshot per case. Expected values were derived BY HAND from the timetable:
+#   Mon 2026-11-09 (service SVC_WK, Mon-Fri; Wed 11-11 removed; Sat service also added on Thu 11-12)
+#   T1 bus100 A 08:00 B 08:10 C 08:20 | T2 bus100 A 08:30 B 08:40 C 08:50 | T8 bus200 A 08:05 -> D2 09:30
+#   T3 rail C2 08:25 -> D1 08:45      | T4 bus100 A 23:50 B 24:05 C 24:20 | T5 rail C2 24:30 -> D1 24:50
+#   T9 bus100 Saturday A 10:00 -> B 10:10 | ferry (T6) must never appear | C and C2 are ~100 m apart
+suite: transit
+cases:
+  - id: tx01
+    desc: timetable-only answers are labelled scheduled-only and ordered by time
+    now: "2026-11-09T07:50"
+    rt: {error: "feed down"}
+    call: {method: next_departures, args: {place: A, limit: 3}}
+    expect:
+      - {path: departures.0.trip_id, eq: T1}
+      - {path: departures.1.trip_id, eq: T8}
+      - {path: departures.2.trip_id, eq: T2}
+      - {path: departures.0.status, eq: scheduled_only}
+      - {path: realtime.source, eq: scheduled_only}
+
+  - id: tx02
+    desc: a 300 s delay is reported in minutes with a predicted time
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 300}]}]}
+    call: {method: next_departures, args: {place: A, limit: 1}}
+    expect:
+      - {path: departures.0.status, eq: delayed}
+      - {path: departures.0.delay_min, approx: 5.0}
+      - {path: departures.0.predicted, eq: "08:05"}
+      - {path: departures.0.delay_basis, eq: reported}
+
+  - id: tx03
+    desc: a cancelled trip is shown as cancelled with no predicted time, and the note says so
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T8, start_date: 20261109, rel: CANCELED}]}
+    call: {method: next_departures, args: {place: A, limit: 5}}
+    expect:
+      - {path: departures, any: {trip_id: T8, status: cancelled}}
+      - {path: departures.1.predicted, absent: true}
+      - {path: note, contains: Cancelled}
+
+  - id: tx04
+    desc: a 20 s delay is inside the on-time threshold
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T2, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 20}]}]}
+    call: {method: next_departures, args: {place: A, limit: 5}}
+    expect:
+      - {path: departures, any: {trip_id: T2, status: on_time}}
+
+  - id: tx05
+    desc: a stop with no update inherits the earlier stop's delay, flagged as an estimate
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 240}]}]}
+    call: {method: next_departures, args: {place: B, limit: 1}}
+    expect:
+      - {path: departures.0.trip_id, eq: T1}
+      - {path: departures.0.delay_min, approx: 4.0}
+      - {path: departures.0.delay_basis, eq: estimated_from_earlier_stop}
+
+  - id: tx06
+    desc: a late-running trip scheduled before now is still listed (it has not left yet)
+    now: "2026-11-09T08:10"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 900}]}]}
+    call: {method: next_departures, args: {place: A, limit: 5}}
+    expect:
+      - {path: departures, any: {trip_id: T1, predicted: "08:15"}}
+
+  - id: tx07
+    desc: a SKIPPED stop is not offered as a departure
+    now: "2026-11-09T08:05"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 2, stop_id: B, rel: SKIPPED}]}]}
+    call: {method: next_departures, args: {place: B, limit: 3}}
+    expect:
+      - {path: departures, none: {trip_id: T1}}
+      - {path: departures.0.trip_id, eq: T2}
+
+  - id: tx08
+    desc: a 24:05 stop time is shown as 00:05 on the next calendar day
+    now: "2026-11-09T23:58"
+    rt: {error: "off"}
+    call: {method: next_departures, args: {place: B, limit: 1}}
+    expect:
+      - {path: departures.0.trip_id, eq: T4}
+      - {path: departures.0.scheduled_iso, eq: "2026-11-10T00:05:00+10:00"}
+      - {path: departures.0.scheduled, eq: "Tue 10 Nov 00:05"}
+
+  - id: tx09
+    desc: after-midnight trip joins realtime by its CALENDAR start date (rt 20261110), not service date
+    now: "2026-11-10T00:20"
+    rt: {trips: [{trip_id: T5, start_date: 20261110, updates: [{seq: 1, stop_id: C2, dep_delay: 240}]}]}
+    call: {method: next_departures, args: {place: C2, limit: 1}}
+    expect:
+      - {path: departures.0.trip_id, eq: T5}
+      - {path: departures.0.service_date, eq: "2026-11-09"}
+      - {path: departures.0.predicted, eq: "00:34"}
+      - {path: departures.0.status, eq: delayed}
+
+  - id: tx10
+    desc: a calendar_dates REMOVAL (Wed 11 Nov) leaves no weekday trips; the next service is named
+    now: "2026-11-11T20:00"
+    rt: {error: "off"}
+    call: {method: next_departures, args: {place: A, limit: 3}}
+    expect:
+      - {path: departures.0.scheduled_iso, eq: "2026-11-12T08:00:00+10:00"}
+      - {path: note, contains: No departures}
+      - {path: note, contains: Thu 12 Nov 08:00}
+
+  - id: tx10b
+    desc: when nothing runs within the 24 h look-ahead the answer says "none", it does not invent one
+    now: "2026-11-11T07:50"
+    rt: {error: "off"}
+    call: {method: next_departures, args: {place: A, limit: 3}}
+    expect:
+      - {path: departures, len: 0}
+      - {path: note, contains: None found in the next 24 hours}
+
+  - id: tx11
+    desc: Saturday timetable differs from weekday
+    now: "2026-11-14T09:30"
+    rt: {error: "off"}
+    call: {method: next_departures, args: {place: A, limit: 5}}
+    expect:
+      - {path: departures, len: 1}
+      - {path: departures.0.trip_id, eq: T9}
+
+  - id: tx12
+    desc: a calendar_dates ADDITION runs Saturday service on Thu 12 Nov
+    now: "2026-11-12T09:30"
+    rt: {error: "off"}
+    call: {method: next_departures, args: {place: A, limit: 5}}
+    expect:
+      - {path: departures, any: {trip_id: T9, scheduled: "10:00"}}
+
+  - id: tx13
+    desc: an unknown route filter is a helpful error, not an empty answer
+    now: "2026-11-09T07:50"
+    call: {method: next_departures, args: {place: A, route_filter: [bus]}}
+    expect_error: {contains: route}
+
+  - id: tx14
+    desc: ferry stops are ingested, and a ferry-only stop is not found when asking for buses
+    now: "2026-11-09T07:50"
+    call: {method: find_stops, args: {query: Ferry, near: null, modes: [bus]}}
+    expect:
+      - {path: stops, len: 0}
+
+  - id: tx15
+    desc: can_i_catch counts the realtime delay (slack 2 min)
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 300}]}]}
+    call: {method: can_i_catch, args: {place: A, my_arrival: "2026-11-09T08:03", scheduled_departure: "2026-11-09T08:00"}}
+    expect:
+      - {path: can_catch, eq: true}
+      - {path: slack_min, approx: 2.0}
+      - {path: basis, eq: realtime}
+
+  - id: tx16
+    desc: can_i_catch says no when you arrive after the delayed departure
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 300}]}]}
+    call: {method: can_i_catch, args: {place: A, my_arrival: "2026-11-09T08:06", scheduled_departure: "2026-11-09T08:00"}}
+    expect:
+      - {path: can_catch, eq: false}
+      - {path: slack_min, approx: -1.0}
+
+  - id: tx17
+    desc: a cancelled trip cannot be caught
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T8, start_date: 20261109, rel: CANCELED}]}
+    call: {method: can_i_catch, args: {place: A, my_arrival: "2026-11-09T07:00", trip_id: T8}}
+    expect:
+      - {path: can_catch, eq: false}
+      - {path: reason, contains: cancelled}
+
+  - id: tx18
+    desc: without realtime, can_i_catch answers from the timetable and says so
+    now: "2026-11-09T07:50"
+    rt: {error: "feed down"}
+    call: {method: can_i_catch, args: {place: A, my_arrival: "2026-11-09T07:55", scheduled_departure: "2026-11-09T08:00"}}
+    expect:
+      - {path: can_catch, eq: true}
+      - {path: slack_min, approx: 5.0}
+      - {path: basis, eq: scheduled_only}
+      - {path: reason, contains: timetable only}
+
+  - id: tx19
+    desc: planner picks earliest arrival with a walking transfer (bus, walk C to C2, train)
+    now: "2026-11-09T07:50"
+    call: {method: plan_trip, args: {origin: home, destination: dee}}
+    expect:
+      - {path: journeys.0.arrive, eq: "08:45"}
+      - {path: journeys.0.transfers, eq: 1}
+      - {path: journeys.0.legs, any: {kind: walk}}
+
+  - id: tx20
+    desc: a delayed boarding is attached to the leg
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, updates: [{seq: 1, stop_id: A, dep_delay: 300}]}]}
+    call: {method: plan_trip, args: {origin: home, destination: dee}}
+    expect:
+      - {path: journeys.0.legs.0.realtime.status, eq: delayed}
+      - {path: journeys.0.legs.0.realtime.predicted_departure, eq: "08:05"}
+      - {path: basis, contains: NOT re-validated}
+
+  - id: tx21
+    desc: a cancelled boarding is flagged on the planned leg
+    now: "2026-11-09T07:50"
+    rt: {trips: [{trip_id: T1, start_date: 20261109, rel: CANCELED}]}
+    call: {method: plan_trip, args: {origin: A, destination: DSTN}}
+    expect:
+      - {path: journeys.0.legs.0.realtime.status, eq: cancelled}
+
+  - id: tx22
+    desc: arrive-by that cannot be met returns no journey and says so
+    now: "2026-11-09T07:50"
+    call: {method: plan_trip, args: {origin: A, destination: DSTN, arrive_by: "2026-11-09T08:40"}}
+    expect:
+      - {path: journeys, len: 0}
+      - {path: note, contains: No journey}
+
+  - id: tx23
+    desc: max_transfers 0 keeps only the direct bus
+    now: "2026-11-09T07:50"
+    call: {method: plan_trip, args: {origin: A, destination: DSTN, max_transfers: 0}}
+    expect:
+      - {path: journeys.0.arrive, eq: "09:30"}
+      - {path: journeys.0.transfers, eq: 0}
+
+  - id: tx24
+    desc: alerts filter by route short name and drop expired ones
+    now: "2026-11-09T07:50"
+    rt:
+      alerts:
+        - {id: live, header: "100 detour", routes: [R1], periods_rel: [[-60, 60]]}
+        - {id: expired, header: "old", routes: [R1], periods_rel: [[-999, -99]]}
+        - {id: other, header: "rail works", routes: [R2]}
+    call: {method: alerts, args: {route_ids: ["100"], stop_ids: null}}
+    expect:
+      - {path: alerts, len: 1}
+      - {path: alerts.0.alert_id, eq: live}
+
+  - id: tx25
+    desc: alerts feed outage is stated explicitly, not reported as "no alerts"
+    now: "2026-11-09T07:50"
+    rt: {error: "boom"}
+    call: {method: alerts, args: {route_ids: null, stop_ids: null}}
+    expect:
+      - {path: realtime.source, eq: scheduled_only}
+      - {path: realtime.note, contains: unavailable}
+
+  - id: tx26
+    desc: a stale realtime cache is reported as stale
+    now: "2026-11-09T07:50"
+    rt: {stale: true, error: "refresh failed", age: 400}
+    call: {method: next_departures, args: {place: A, limit: 1}}
+    expect:
+      - {path: realtime.stale, eq: true}
+
+  - id: tx27
+    desc: asking for a time that has already passed today is called out
+    now: "2026-11-09T23:59"
+    rt: {error: "off"}
+    call: {method: next_departures, args: {place: A, after: "2026-11-09T07:30"}}
+    expect:
+      - {path: note, contains: already in the past}

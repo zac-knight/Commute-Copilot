@@ -1,0 +1,109 @@
+# commute_advice: the deterministic rule engine (no LLM) against hand-derived expectations.
+# Frozen clock: Mon 2026-11-09 07:50. Forecast: hourly slots from 00:00 on 11-09 (hour key = hours since
+# then; 8 = the 08:00 slot, which describes the PRECEDING hour for rain/UV/gusts). Default weather is a
+# mild, dry day. Trips default to one bus leg 08:00-08:30 with on-time realtime (confidence baseline 0.90).
+# Window model (docs/decisions.md): access = 5 min walk + 2 min wait before boarding; egress = 5 min after.
+suite: advice
+cases:
+  - id: ad01
+    desc: mild dry day with on-time realtime, go now, nothing to bring, baseline confidence 0.90
+    expect:
+      - {path: leave_now, eq: true}
+      - {path: bring, len: 0}
+      - {path: hazards.blocking_level, eq: 0}
+      - {path: confidence, approx: 0.90}
+
+  - id: ad02
+    desc: likely rain across the trip hours means wait; the suggestion lands after the rain ends
+    forecast: {hours: {8: {rain_prob_pct: 80, rain_mm: 2.0}, 9: {rain_prob_pct: 80, rain_mm: 2.0}}}
+    expect:
+      - {path: leave_now, eq: false}
+      - {path: bring, contains: umbrella}
+      - {path: hazards.blocking_level, gte: 2}
+      - {path: suggested_leave_time, eq: "09:10"}
+
+  - id: ad03
+    desc: a 40% chance of drizzle is "bring an umbrella", not "change your plans"
+    forecast: {hours: {8: {rain_prob_pct: 40, rain_mm: 0.1}}}
+    expect:
+      - {path: leave_now, eq: true}
+      - {path: bring, contains: umbrella}
+      - {path: hazards.blocking_level, lte: 1}  # 1 = minor: bring something, do not re-plan
+
+  - id: ad04
+    desc: a thunderstorm code at departure blocks the trip and the reason says so
+    forecast: {hours: {8: {weather_code: 95, rain_prob_pct: 70, rain_mm: 3.0}}}
+    expect:
+      - {path: leave_now, eq: false}
+      - {path: hazards.blocking_level, gte: 2}
+      - {path: reasons, has_text: thunder}
+
+  - id: ad05
+    desc: a cancelled service invalidates the plan, whatever the weather is
+    plan: {legs: [{kind: transit, dep: "08:00", arr: "08:30", route: "680", status: cancelled}]}
+    expect:
+      - {path: leave_now, eq: false}
+      - {path: reasons, has_text: cancelled}
+      - {path: bring, len: 0}
+
+  - id: ad06
+    desc: a 12 min delay on the first service pushes the leave time back instead of "leave now"
+    plan: {legs: [{kind: transit, dep: "08:00", arr: "08:30", route: "680", status: delayed, delay: 12}]}
+    expect:
+      - {path: leave_now, eq: false}
+      - {path: suggested_leave_time, eq: "08:05"}
+      - {path: reasons, has_text: 12 min late}
+
+  - id: ad07
+    desc: no weather data - the advice says so, ignores weather, and is not confident
+    forecast: null
+    expect:
+      - {path: weather.source, eq: unavailable}
+      - {path: reasons, has_text: unavailable}
+      - {path: confidence, lte: 0.30}
+
+  - id: ad08
+    desc: very high UV during an exposed window adds sunscreen and a hat
+    now: "2026-11-09T10:50"
+    plan: {legs: [{kind: transit, dep: "11:00", arr: "11:30", route: "680", status: on_time}]}
+    forecast: {hours: {11: {uv_index: 9.0}, 12: {uv_index: 9.0}}}
+    expect:
+      - {path: bring, contains: sunscreen and a hat}
+      - {path: hazards.uv_index, gte: 8}
+
+  - id: ad09
+    desc: extreme heat all day - waiting cannot help, so the advice says go prepared rather than wait
+    forecast: {defaults: {apparent_c: 38.0, temperature_c: 35.0}}
+    expect:
+      - {path: leave_now, eq: true}
+      - {path: bring, contains: water}
+      - {path: reasons, has_text: would not help}
+
+  - id: ad10
+    desc: severe gusts at departure block the trip; an umbrella is not recommended in strong wind
+    forecast: {hours: {8: {gust_kmh: 70.0, wind_kmh: 40.0, rain_prob_pct: 50, rain_mm: 0.6}}}
+    expect:
+      - {path: leave_now, eq: false}
+      - {path: hazards.blocking_level, gte: 2}
+      - {path: bring.0, contains: rain jacket}
+
+  - id: ad11
+    desc: 30-70% rain chance is "genuinely uncertain", so confidence drops 0.15
+    forecast: {hours: {8: {rain_prob_pct: 50, rain_mm: 0.2}}}
+    expect:
+      - {path: confidence, approx: 0.75}
+      - {path: bring, contains: umbrella}
+
+  - id: ad12
+    desc: a plan with no realtime on any leg (timetable only) costs 0.10 confidence
+    plan: {legs: [{kind: transit, dep: "08:00", arr: "08:30", route: "680"}]}
+    expect:
+      - {path: confidence, approx: 0.80}
+
+  - id: ad13
+    desc: forecasting more than 24 h ahead costs 0.20 confidence
+    now: "2026-11-09T07:50"
+    plan: {legs: [{kind: transit, day: 1, dep: "09:00", arr: "09:30", route: "680", status: on_time}]}
+    expect:
+      - {path: confidence, approx: 0.70}
+      - {path: leave_now, eq: false}

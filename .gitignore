@@ -1,0 +1,43 @@
+# secrets & local credentials: never commit
+.env
+.env.*
+!.env.example
+**/credentials.json
+**/token.json
+**/*.pem
+
+# large files: model weights, downloaded datasets (re-downloadable, never commit)
+.ollama/
+*.gguf
+*.safetensors
+*.bin
+*.zip
+*.parquet
+*.pb
+backend/data/gtfs/
+
+# python
+__pycache__/
+*.pyc
+.venv/
+.mypy_cache/
+.ruff_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+
+# local data (GTFS downloads, sqlite traces/caches, analysis output)
+backend/data/*
+!backend/data/.gitkeep
+*.sqlite
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+# node / frontend
+node_modules/
+frontend/dist/
+playwright-report/
+test-results/
+
+.DS_Store

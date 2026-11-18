@@ -1,0 +1,6 @@
+{
+  "frozen_now": "2026-11-18T07:45:00+10:00",
+  "weather": "A real Open-Meteo capture (2026-11-18) with a SYNTHETIC shower added at 08:00-10:00 so the leave-now-or-wait advice has something to decide.",
+  "transit": "Real TransLink SEQ GTFS (feed 2026-11-17..2027-01-16) with a hand-made frozen realtime snapshot (one delayed and one cancelled 680).",
+  "calendar": "Fake calendar seeded relative to the frozen date; includes one hostile event on purpose."
+}

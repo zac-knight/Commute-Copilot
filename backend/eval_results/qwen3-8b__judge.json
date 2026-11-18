@@ -1,0 +1,235 @@
+{
+ "schema": 1,
+ "kind": "judge",
+ "model": "qwen3:8b",
+ "run_at": "2026-11-17T17:06:53+00:00",
+ "frozen_now": "2026-11-18T07:45:00+10:00",
+ "router_prompt": "router-v3",
+ "judge_model": "qwen3:8b",
+ "judge_prompt": "judge-v1",
+ "e2e_run_at": "2026-11-17T17:02:50+00:00",
+ "self_judged": true,
+ "summary": {
+  "items": {
+   "k": 30,
+   "n": 42,
+   "rate": 0.7142857142857143,
+   "lo": 0.5643250392275445,
+   "hi": 0.8283314125542434
+  },
+  "answers": 24,
+  "unparseable": 0
+ },
+ "cases": [
+  {
+   "id": "e01",
+   "items": [
+    true,
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    },\n    {\n      \"n\": 3,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "e02",
+   "items": [
+    false,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": false\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "e03",
+   "items": [
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\"items\": [{\"n\":1,\"pass\":true}]}"
+  },
+  {
+   "id": "e04",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "e05",
+   "items": [
+    false,
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\"n\": 1, \"pass\": false},\n    {\"n\": 2, \"pass\": false}\n  ]\n}"
+  },
+  {
+   "id": "e06",
+   "items": [
+    false,
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": false\n    },\n    {\n      \"n\": 2,\n      \"pass\": false\n    }\n  ]\n}"
+  },
+  {
+   "id": "e07",
+   "items": [
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\"items\": [{\"n\":1,\"pass\":true}]}"
+  },
+  {
+   "id": "e08",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\"n\":1,\"pass\":true},\n    {\"n\":2,\"pass\":true}\n  ]\n}"
+  },
+  {
+   "id": "e09",
+   "items": [
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "e10",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\"n\": 1, \"pass\": true},\n    {\"n\": 2, \"pass\": true}\n  ]\n}"
+  },
+  {
+   "id": "e11",
+   "items": [
+    true,
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": false\n    }\n  ]\n}"
+  },
+  {
+   "id": "e12",
+   "items": [
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\"items\": [{\"n\":1,\"pass\":true}]}"
+  },
+  {
+   "id": "e13",
+   "items": [
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\"items\": [{\"n\":1,\"pass\":true}]}"
+  },
+  {
+   "id": "e14",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "m01",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\"n\": 1, \"pass\": true},\n    {\"n\": 2, \"pass\": true}\n  ]\n}"
+  },
+  {
+   "id": "m02",
+   "items": [
+    false,
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": false\n    },\n    {\n      \"n\": 2,\n      \"pass\": false\n    }\n  ]\n}"
+  },
+  {
+   "id": "m03",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "m04",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\"n\": 1, \"pass\": true},\n    {\"n\": 2, \"pass\": true}\n  ]\n}"
+  },
+  {
+   "id": "m05",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\"n\": 1, \"pass\": true},\n    {\"n\": 2, \"pass\": true}\n  ]\n}"
+  },
+  {
+   "id": "m06",
+   "items": [
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": false\n    }\n  ]\n}"
+  },
+  {
+   "id": "m07",
+   "items": [
+    true,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "m08",
+   "items": [
+    false,
+    true
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": false\n    },\n    {\n      \"n\": 2,\n      \"pass\": true\n    }\n  ]\n}"
+  },
+  {
+   "id": "m09",
+   "items": [
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": false\n    }\n  ]\n}"
+  },
+  {
+   "id": "m10",
+   "items": [
+    true,
+    false
+   ],
+   "unparseable": false,
+   "raw": "{\n  \"items\": [\n    {\n      \"n\": 1,\n      \"pass\": true\n    },\n    {\n      \"n\": 2,\n      \"pass\": false\n    }\n  ]\n}"
+  }
+ ]
+}
